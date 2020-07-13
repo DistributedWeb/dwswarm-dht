@@ -1,7 +1,7 @@
 {
-  "name": "@hyperswarm/dht",
-  "version": "1.0.1",
-  "description": "The DHT backing the HyperSwarm stack",
+  "name": "dwswarm-dht",
+  "version": "1.0.0",
+  "description": "The DHT backing the dwswarm stack",
   "main": "index.js",
   "dependencies": {
     "dht-rpc": "^4.1.6",
