@@ -1,10 +1,8 @@
-'use strict'
 const { DHT } = require('dht-rpc')
 const recordCache = require('record-cache')
 const { PeersInput, PeersOutput } = require('./messages')
 const peers = require('ipv4-peers')
-const LRU = require('hashlru')
-const { ImmutableStore, MutableStore } = require('./stores')
+
 const DEFAULT_BOOTSTRAP = [
   'bootstrap1.hyperdht.org:49737',
   'bootstrap2.hyperdht.org:49737',
@@ -19,33 +17,22 @@ class HyperDHT extends DHT {
     if (opts.bootstrap === undefined) opts.bootstrap = DEFAULT_BOOTSTRAP
 
     super(opts)
-    const {
-      maxAge = 12 * 60 * 1000,
-      maxValues = 5000
-    } = opts
+
     const peers = recordCache({
       maxSize: 65536,
-      maxAge
+      maxAge: 12 * 60 * 1000
     })
-    const onpeers = this._onpeers.bind(this)
 
     this._peers = peers
-    this._store = LRU(maxValues)
 
-    this.mutable = new MutableStore(this, this._store)
-    this.immutable = new ImmutableStore(this, this._store)
+    const onpeers = this._onpeers.bind(this)
 
-    this.command('mutable-store', this.mutable._command())
-    this.command('immutable-store', this.immutable._command())
+    this.once('close', peers.destroy.bind(peers))
     this.command('peers', {
       inputEncoding: PeersInput,
       outputEncoding: PeersOutput,
       update: onpeers,
       query: onpeers
-    })
-    this.once('close', () => {
-      this._peers.destroy()
-      this._store.clear()
     })
   }
 
@@ -57,7 +44,8 @@ class HyperDHT extends DHT {
       port: opts.port,
       localAddress: encodeAddress(opts.localAddress)
     }
-    return this.query('peers', key, query, cb).map(mapPeers.bind(null, query.localAddress))
+
+    return this.query('peers', key, opts, cb).map(mapPeers.bind(null, query.localAddress))
   }
 
   announce (key, opts, cb) {
@@ -86,15 +74,16 @@ class HyperDHT extends DHT {
   }
 
   _onpeers (query, cb) {
-    const value = query.value
+    const value = query.value || {}
     const from = {
       port: value.port || query.node.port,
       host: query.node.host
     }
+
     if (!(from.port > 0 && from.port < 65536)) return cb(new Error('Invalid port'))
 
     const localRecord = value.localAddress
-    const remoteRecord = peers.encode([from])
+    const remoteRecord = peers.encode([ from ])
 
     const remoteCache = query.target.toString('hex')
     const localCache = localRecord &&
@@ -112,12 +101,13 @@ class HyperDHT extends DHT {
         localPeers: local.length ? Buffer.concat(local) : null
       })
     }
+
     if (value.unannounce) {
-      this._peers.remove(remoteCache, remoteRecord)
+      if (remoteRecord) this._peers.remove(remoteCache, remoteRecord)
       if (localRecord) this._peers.remove(localCache, localSuffix)
       this.emit('unannounce', query.target, from)
     } else {
-      this._peers.add(remoteCache, remoteRecord)
+      if (remoteRecord) this._peers.add(remoteCache, remoteRecord)
       if (localRecord) this._peers.add(localCache, localSuffix)
       this.emit('announce', query.target, from)
     }
@@ -127,10 +117,12 @@ class HyperDHT extends DHT {
 }
 
 function encodeAddress (addr) {
-  return addr ? peers.encode([addr]) : null
+  return addr ? peers.encode([ addr ]) : null
 }
 
 function filter (list, item) {
+  if (!item) return list
+
   for (var i = 0; i < list.length; i++) {
     if (list[i].equals(item)) {
       list[i] = list[list.length - 1]
@@ -138,12 +130,14 @@ function filter (list, item) {
       break
     }
   }
+
   return list
 }
 
 function mapPeers (prefix, data) {
   const v = data.value
   if (!v || (!v.peers && !v.localPeers)) return null
+
   try {
     return {
       node: data.node,
@@ -151,11 +145,7 @@ function mapPeers (prefix, data) {
       localPeers: prefix && v.localPeers && decodeLocalPeers(prefix, v.localPeers)
     }
   } catch (err) {
-    return {
-      node: data.node,
-      peers: [],
-      localPeers: prefix && v.localPeers && decodeLocalPeers(prefix, v.localPeers)
-    }
+    return null
   }
 }
 
