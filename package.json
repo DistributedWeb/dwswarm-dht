@@ -20,7 +20,7 @@
     "tap": "^14.5.0"
   },
   "bin": {
-    "hyperswarm-dht": "./bin.js"
+    "dwswarm-dht": "./bin.js"
   },
   "scripts": {
     "test": "tap  -R classic test/*.test.js  && standard --fix",
@@ -36,12 +36,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mafintosh/dht.git"
+    "url": "https://github.com/distributedweb/dht.git"
   },
-  "author": "Mathias Buus (@mafintosh)",
+  "author": "Mathias Buus (@distributedweb)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hyperswarm/dht/issues"
+    "url": "https://github.com/dwswarm/dht/issues"
   },
-  "homepage": "https://github.com/hyperswarm/dht"
+  "homepage": "https://github.com/dwswarm/dht"
 }
