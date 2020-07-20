@@ -1,6 +1,6 @@
 {
   "name": "dwswarm-dht",
-  "version": "beta",
+  "version": "1.0.0-beta",
   "description": "The DHT backing the HyperSwarm stack",
   "main": "index.js",
   "dependencies": {
