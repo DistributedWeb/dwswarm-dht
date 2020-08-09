@@ -1,5 +1,5 @@
 'use strict'
-const { DHT } = require('dht-rpc')
+const { DHT } = require('dweb-dht-rpc')
 const recordCache = require('record-cache')
 const { PeersInput, PeersOutput } = require('./messages')
 const { ipv4, local } = require('./peers')
@@ -7,9 +7,10 @@ const LRU = require('hashlru')
 const { ImmutableStore, MutableStore } = require('./stores')
 const guardTimeout = require('guard-timeout').create({ lagMs: 60 * 1000 })
 const DEFAULT_BOOTSTRAP = [
-  'bootstrap1.hyperdht.org:49737',
-  'bootstrap2.hyperdht.org:49737',
-  'bootstrap3.hyperdht.org:49737'
+  'bootstrap1.dwebx.net:6620',
+  'bootstrap2.dwebx.net:6620',
+  'bootstrap3.dwebx.net:6620',
+  'bootstrap4.dwebx.net:6620'
 ]
 
 // 20 mins but will be round(EPH_AFTER + random() * EPH_AFTER / 2), so will be between 20-30 mins

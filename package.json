@@ -1,11 +1,11 @@
 {
-  "name": "@hyperswarm/dht",
-  "version": "4.0.1",
-  "description": "The DHT backing the HyperSwarm stack",
+  "name": "dwswarm-dht",
+  "version": "1.0.0",
+  "description": "The DHT backing the DwSwarm stack",
   "main": "index.js",
   "dependencies": {
-    "@hyperswarm/hypersign": "^2.0.0",
-    "dht-rpc": "^4.8.0",
+    "ddatabasesign": "git://github.com/DistributedWeb/ddatabasesign.git#3fdd5a0c2626ea5dc3991ea65807a35fcdb63294",
+    "dweb-dht-rpc": "git://github.com/DistributedWeb/dweb-dht-rpc.git#d7fe57cb7c6ca8ba88eb736aa9a919174355b877",
     "end-of-stream": "^1.4.1",
     "guard-timeout": "^2.0.0",
     "hashlru": "^2.3.0",
@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperswarm/dht.git"
+    "url": "https://github.com/dwswarm/dht.git"
   },
   "author": "Mathias Buus (@mafintosh)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hyperswarm/dht/issues"
+    "url": "https://github.com/dwswarm/dht/issues"
   },
-  "homepage": "https://github.com/hyperswarm/dht"
+  "homepage": "https://github.com/dwswarm/dht"
 }
